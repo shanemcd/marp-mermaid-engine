@@ -6,7 +6,7 @@ const engine = await createEngine({})
 const diagram = [
   'flowchart LR',
   '  A[One] --> B[Two]',
-  '  classDef warm fill:#ffdddd,stroke:#ee0000,color:#151515;',
+  '  classDef warm fill:#fff4cc,stroke:#666666,color:#222222;',
   '  class A warm;',
 ].join('\n')
 const markdown = [

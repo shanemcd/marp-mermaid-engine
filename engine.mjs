@@ -13,30 +13,6 @@ const DIAGRAMS_KEY = '__marpMermaidDiagrams'
 const svgCache = new Map()
 const CACHE_LIMIT = 128
 
-const mermaidConfig = {
-  theme: 'base',
-  themeVariables: {
-    fontFamily: 'Red Hat Display, Helvetica Neue, Arial, sans-serif',
-    primaryColor: '#f0f0f0',
-    primaryTextColor: '#151515',
-    primaryBorderColor: '#ee0000',
-    lineColor: '#4d4d4d',
-    secondaryColor: '#e7f1fa',
-    tertiaryColor: '#f7f7f7',
-    clusterBkg: '#f7f7f7',
-    clusterBorder: '#6a6e73',
-    edgeLabelBackground: '#ffffff',
-  },
-  flowchart: {
-    htmlLabels: true,
-    curve: 'basis',
-    padding: 16,
-    nodeSpacing: 32,
-    rankSpacing: 42,
-  },
-  themeCSS: '.nodeLabel, .label, .cluster-label { font-weight: 600; }',
-}
-
 const mermaidFencePlugin = (md) => {
   const defaultFence = md.renderer.rules.fence
 
@@ -62,7 +38,6 @@ const mermaidFencePlugin = (md) => {
 
 async function renderDiagram(id, definition, tempDir) {
   const cacheKey = createHash('sha256')
-    .update(JSON.stringify(mermaidConfig))
     .update(id)
     .update(definition)
     .digest('hex')
@@ -81,7 +56,6 @@ async function renderDiagram(id, definition, tempDir) {
     },
     parseMMDOptions: {
       backgroundColor: 'transparent',
-      mermaidConfig,
       svgId: id,
       viewport: { width: 1280, height: 720, deviceScaleFactor: 1 },
     },
