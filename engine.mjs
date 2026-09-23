@@ -9,8 +9,13 @@ import katexPlugin from '@marp-team/marp-core/plugins/katex'
 import mathjaxPlugin from '@marp-team/marp-core/plugins/mathjax'
 import shikiPlugin from '@marp-team/marp-core/plugins/shiki'
 import { run as renderMermaid } from '@mermaid-js/mermaid-cli'
+import puppeteer from 'puppeteer'
 
 const RENDER_CONTEXT_KEY = '__marpMermaidRenderContext'
+const PUPPETEER_CONFIG = {
+  headless: true,
+  args: ['--force-color-profile=srgb'],
+}
 const require = createRequire(import.meta.url)
 const svgCache = new Map()
 const CACHE_LIMIT = 128
@@ -138,13 +143,12 @@ async function renderDiagram(id, definition, tempDir, context) {
   const inputFile = path.join(tempDir, `${id}.mmd`)
   const outputFile = path.join(tempDir, `${id}.svg`)
   await writeFile(inputFile, definition)
+  context.browser ??= await puppeteer.launch(PUPPETEER_CONFIG)
   await renderMermaid(inputFile, outputFile, {
+    browser: context.browser,
     outputFormat: 'svg',
     quiet: true,
-    puppeteerConfig: {
-      headless: true,
-      args: ['--force-color-profile=srgb'],
-    },
+    puppeteerConfig: PUPPETEER_CONFIG,
     parseMMDOptions: {
       backgroundColor: 'transparent',
       mermaidConfig: context.mermaidConfig,
@@ -199,7 +203,11 @@ class MermaidMarp extends Marp {
       }
       return result
     } finally {
-      await rm(tempDir, { recursive: true, force: true })
+      try {
+        await context.browser?.close()
+      } finally {
+        await rm(tempDir, { recursive: true, force: true })
+      }
     }
   }
 }

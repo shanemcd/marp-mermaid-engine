@@ -3,6 +3,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 
+import puppeteer from 'puppeteer'
 import createEngine from '../engine.mjs'
 
 const themeDir = await mkdtemp(path.join(os.tmpdir(), 'marp-mermaid-theme-test-'))
@@ -59,7 +60,31 @@ try {
     '',
   ].join('\n')
 
-  const { html } = await engine.render(markdown)
+  const originalLaunch = puppeteer.launch
+  let browserLaunches = 0
+  puppeteer.launch = (...args) => {
+    browserLaunches += 1
+    return originalLaunch.apply(puppeteer, args)
+  }
+
+  let html
+  try {
+    html = (await engine.render(markdown)).html
+    assert.equal(
+      browserLaunches,
+      1,
+      'one Puppeteer browser should serve all diagrams in one render',
+    )
+    await engine.render(markdown)
+    assert.equal(
+      browserLaunches,
+      1,
+      'a cached re-render should not launch another browser',
+    )
+  } finally {
+    puppeteer.launch = originalLaunch
+  }
+
   const ids = [...html.matchAll(/<svg data-marp-mermaid id="([^"]+)"/g)].map(
     ([, id]) => id,
   )

@@ -2,7 +2,7 @@
 
 A custom Marp Core 5 engine that renders fenced Mermaid diagrams with standard Mermaid.js through `@mermaid-js/mermaid-cli`. This supports Mermaid syntax such as `classDef` and `class` while keeping diagram source in Markdown and inlining the resulting SVGs in Marp output.
 
-The engine also installs Marp Core's MathJax, KaTeX, and Shiki plugins.
+The engine also installs Marp Core's MathJax, KaTeX, and Shiki plugins. For a cold document render, it launches one Puppeteer browser and reuses it across uncached Mermaid diagrams instead of starting a browser for each diagram. It also keeps a bounded in-memory SVG cache, so unchanged diagrams can be reused during later renders in the same engine process; a new preview process starts with a cold cache.
 
 ## Requirements
 
