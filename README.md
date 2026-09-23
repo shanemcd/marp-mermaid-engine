@@ -20,19 +20,24 @@ npm ci --prefix "$HOME/.local/share/marp-mermaid-engine"
 
 # Run once if Puppeteer's browser install was skipped or no Chrome is available.
 (cd "$HOME/.local/share/marp-mermaid-engine" && npx puppeteer browsers install chrome)
+
+# Make the package name resolvable from decks anywhere under your home directory.
+mkdir -p "$HOME/node_modules"
+if [ ! -e "$HOME/node_modules/marp-mermaid-engine" ] && [ ! -L "$HOME/node_modules/marp-mermaid-engine" ]; then
+  ln -s "$HOME/.local/share/marp-mermaid-engine" "$HOME/node_modules/marp-mermaid-engine"
+fi
 ```
 
-Configure `marp-mode` to use the engine file:
+Configure `marp-mode` to use the package name:
 
 ```elisp
-(setq marp-engine
-      (expand-file-name "~/.local/share/marp-mermaid-engine/engine.mjs"))
+(setq marp-engine "marp-mermaid-engine")
 ```
 
 Or run Marp directly:
 
 ```sh
-marp --engine "$HOME/.local/share/marp-mermaid-engine/engine.mjs" --preview slides.md
+marp --engine marp-mermaid-engine --preview slides.md
 ```
 
 To update an existing clone:
@@ -42,11 +47,11 @@ git -C "$HOME/.local/share/marp-mermaid-engine" pull --ff-only
 npm ci --prefix "$HOME/.local/share/marp-mermaid-engine"
 ```
 
-The repository is public, so no GitHub authentication is needed to clone or pull it.
+The repository is public, so no GitHub authentication is needed to clone or pull it. The `"private": true` field in `package.json` only prevents accidental `npm publish`; it does not affect GitHub visibility, cloning, or use as a Marp engine.
 
 ## Package-name resolution
 
-Marp CLI also accepts a package specifier, for example `--engine marp-mermaid-engine`, when the package is installed in a `node_modules` directory resolvable from the Markdown file or current working directory. A global npm install is not necessarily in that resolution path; the absolute engine-file path above is the reliable choice for a user-level installation.
+Marp CLI resolves package specifiers from the Markdown file's directory and current working directory. The symlink above makes `marp-mermaid-engine` resolvable for decks under your home directory, while keeping the actual Git checkout in `~/.local/share`.
 
 ## Test
 
