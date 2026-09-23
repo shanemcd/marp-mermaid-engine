@@ -1,6 +1,6 @@
 {
   "name": "marp-mermaid-engine",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "A Marp Core engine that renders Mermaid fences with standard Mermaid.js via Mermaid CLI.",
   "type": "module",
