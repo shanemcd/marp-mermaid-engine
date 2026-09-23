@@ -31,6 +31,33 @@ marp --engine "$(npm root -g)/marp-mermaid-engine/engine.mjs" --preview slides.m
 
 To update the engine, run the same `npm install -g` command again.
 
+## Reuse Mermaid configuration and CSS
+
+The engine supports one optional `mermaid-config` fence and one optional `mermaid-css` fence per Markdown document. They are removed from the rendered slides and applied to every Mermaid diagram in that document:
+
+````markdown
+```mermaid-config
+{
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#f2f2f2",
+    "primaryBorderColor": "#707070"
+  }
+}
+```
+
+```mermaid-css
+svg[data-marp-mermaid] { max-height: 450px; }
+```
+
+```mermaid
+flowchart LR
+  A --> B
+```
+````
+
+`mermaid-config` accepts a Mermaid configuration object and is passed to Mermaid CLI as `mermaidConfig`. `mermaid-css` is embedded into each rendered SVG through Mermaid CLI's `myCSS` option. These defaults are document-scoped; individual diagrams can still use Mermaid's own directives for exceptions.
+
 ## Test
 
 ```sh
