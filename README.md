@@ -17,6 +17,9 @@ The engine keeps Mermaid source in the Markdown deck, renders SVGs asynchronousl
 git clone https://github.com/shanemcd/marp-mermaid-engine.git \
   "$HOME/.local/share/marp-mermaid-engine"
 npm ci --prefix "$HOME/.local/share/marp-mermaid-engine"
+
+# Run once if Puppeteer's browser install was skipped or no Chrome is available.
+(cd "$HOME/.local/share/marp-mermaid-engine" && npx puppeteer browsers install chrome)
 ```
 
 Configure `marp-mode` to use the engine file:
@@ -39,7 +42,7 @@ git -C "$HOME/.local/share/marp-mermaid-engine" pull --ff-only
 npm ci --prefix "$HOME/.local/share/marp-mermaid-engine"
 ```
 
-The repository is private for now, so authenticate with GitHub on each machine before cloning or pulling.
+The repository is public, so no GitHub authentication is needed to clone or pull it.
 
 ## Package-name resolution
 
