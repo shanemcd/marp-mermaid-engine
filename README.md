@@ -11,21 +11,20 @@ The engine keeps Mermaid source in the Markdown deck, renders SVGs asynchronousl
 - Marp Core 5
 - A Puppeteer-compatible browser installation
 
-## Install from GitHub for a user-level Emacs setup
+## Install from GitHub
+
+Install the public GitHub repo directly into your home-level `node_modules`:
 
 ```sh
-git clone https://github.com/shanemcd/marp-mermaid-engine.git \
-  "$HOME/.local/share/marp-mermaid-engine"
-npm ci --prefix "$HOME/.local/share/marp-mermaid-engine"
+npm install --prefix "$HOME" --no-save --package-lock=false github:shanemcd/marp-mermaid-engine
+```
 
-# Run once if Puppeteer's browser install was skipped or no Chrome is available.
-(cd "$HOME/.local/share/marp-mermaid-engine" && npx puppeteer browsers install chrome)
+No clone or symlink is needed. This makes `marp-mermaid-engine` resolvable from decks located under your home directory. To update it, run the same command again.
 
-# Make the package name resolvable from decks anywhere under your home directory.
-mkdir -p "$HOME/node_modules"
-if [ ! -e "$HOME/node_modules/marp-mermaid-engine" ] && [ ! -L "$HOME/node_modules/marp-mermaid-engine" ]; then
-  ln -s "$HOME/.local/share/marp-mermaid-engine" "$HOME/node_modules/marp-mermaid-engine"
-fi
+If Puppeteer's browser install was skipped and Chrome is not available, install it once:
+
+```sh
+(cd "$HOME" && npx puppeteer browsers install chrome)
 ```
 
 Configure `marp-mode` to use the package name:
@@ -40,18 +39,7 @@ Or run Marp directly:
 marp --engine marp-mermaid-engine --preview slides.md
 ```
 
-To update an existing clone:
-
-```sh
-git -C "$HOME/.local/share/marp-mermaid-engine" pull --ff-only
-npm ci --prefix "$HOME/.local/share/marp-mermaid-engine"
-```
-
-The repository is public, so no GitHub authentication is needed to clone or pull it. The `"private": true` field in `package.json` only prevents accidental `npm publish`; it does not affect GitHub visibility, cloning, or use as a Marp engine.
-
-## Package-name resolution
-
-Marp CLI resolves package specifiers from the Markdown file's directory and current working directory. The symlink above makes `marp-mermaid-engine` resolvable for decks under your home directory, while keeping the actual Git checkout in `~/.local/share`.
+The GitHub repository is public. The `"private": true` field in `package.json` only prevents accidental `npm publish`; it does not affect GitHub visibility, cloning, or use as a Marp engine.
 
 ## Test
 
