@@ -19,7 +19,11 @@ The GitHub repository is public. Install it globally with npm:
 npm install -g github:shanemcd/marp-mermaid-engine
 ```
 
-The package is marked `"private": true` to prevent accidental `npm publish`; this does not prevent installing it from GitHub.
+The package is marked `"private": true` to prevent accidental `npm publish`; this does not prevent installing it from GitHub. The engine does not bundle a theme. For global use with the Red Hat companion assets, install both packages into the same global npm root:
+
+```sh
+npm install -g github:shanemcd/marp-mermaid-engine github:shanemcd/marp-theme-redhat
+```
 
 ## Use with Marp CLI
 
@@ -33,7 +37,14 @@ To update the engine, run the same `npm install -g` command again.
 
 ## Theme-provided Mermaid defaults
 
-A Marp theme can provide Mermaid renderer defaults alongside its stylesheet. Add metadata comments to the theme CSS:
+Mermaid configuration and CSS belong with the Marp theme, not in special deck fences. Put the companion assets beside the theme stylesheet and reference them with metadata comments:
+
+```text
+marp-theme-redhat/
+├── theme.css
+├── mermaid.config.json
+└── mermaid.css
+```
 
 ```css
 /* @theme redhat */
@@ -41,7 +52,40 @@ A Marp theme can provide Mermaid renderer defaults alongside its stylesheet. Add
 /* @marp-mermaid-css ./mermaid.css */
 ```
 
-The engine matches the deck's `theme` frontmatter value to the `@theme` name in the registered `themeSet` files, then loads the referenced files relative to that theme CSS. If Marp CLI does not pass `themeSet` to the engine, it also resolves the conventional package `marp-theme-<theme-name>`; hosts can set `MARP_MERMAID_THEME_SET` to one or more CSS paths as an explicit fallback. The JSON file is passed to Mermaid CLI as `mermaidConfig`; the CSS file is embedded into each rendered SVG through `myCSS`. Themes without these metadata comments continue to render with Mermaid's defaults. Individual diagrams can still use Mermaid directives for local exceptions.
+Register the theme CSS with Marp CLI's `themeSet` option as well. For a project-local setup, install both packages:
+
+```sh
+npm install --save-dev github:shanemcd/marp-mermaid-engine github:shanemcd/marp-theme-redhat
+```
+
+Then create `marp.config.mjs` in the project root:
+
+```js
+import { createRequire } from 'node:module'
+
+const require = createRequire(import.meta.url)
+
+export default {
+  engine: require.resolve('marp-mermaid-engine'),
+  themeSet: require.resolve('marp-theme-redhat/theme.css'),
+}
+```
+
+Select the theme in the deck frontmatter and use ordinary Mermaid fences:
+
+````markdown
+---
+marp: true
+theme: redhat
+---
+
+```mermaid
+flowchart LR
+  source[Source] --> target[Target]
+```
+````
+
+Do not add `mermaid-config` or `mermaid-css` fences to the deck. The engine matches the frontmatter theme name to the stylesheet's `@theme` declaration, resolves the companion paths relative to that stylesheet, and applies the config and CSS to every Mermaid diagram in the render (`mermaidConfig` and `myCSS`, respectively). It finds the stylesheet from Marp's `themeSet`, `MARP_MERMAID_THEME_SET`, or the conventional package name `marp-theme-<theme-name>`. For a differently named package, set `MARP_MERMAID_THEME_SET` to the theme CSS path. The theme must still be registered with Marp CLI to style slides. Themes without these metadata comments render with Mermaid defaults; individual diagrams may use Mermaid directives for intentional local overrides.
 
 ## Test
 
