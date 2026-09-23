@@ -9,7 +9,7 @@ The engine also installs Marp Core's MathJax, KaTeX, and Shiki plugins.
 - Node.js 20 or newer
 - Marp CLI 3.2.1 or newer (for async engine rendering)
 - Marp Core 5
-- A Puppeteer-compatible Chrome/Chromium installation
+- Puppeteer `^23`–`^25` (peer dependency). Puppeteer normally downloads a compatible managed browser, so a separate system Chrome/Chromium installation is usually unnecessary. If that download is disabled or unavailable, configure Puppeteer to use an existing compatible browser.
 
 ## Install
 
