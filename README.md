@@ -13,33 +13,34 @@ The engine keeps Mermaid source in the Markdown deck, renders SVGs asynchronousl
 
 ## Install from GitHub
 
-Install the public GitHub repo directly into your home-level `node_modules`:
-
 ```sh
-npm install --prefix "$HOME" --no-save --package-lock=false github:shanemcd/marp-mermaid-engine
+npm install -g github:shanemcd/marp-mermaid-engine
 ```
-
-No clone or symlink is needed. This makes `marp-mermaid-engine` resolvable from decks located under your home directory. To update it, run the same command again.
 
 If Puppeteer's browser install was skipped and Chrome is not available, install it once:
 
 ```sh
-(cd "$HOME" && npx puppeteer browsers install chrome)
+npx puppeteer browsers install chrome
 ```
 
-Configure `marp-mode` to use the package name:
+Configure `marp-mode` to use the installed engine file. Using `npm root -g` avoids hard-coding the global npm prefix:
 
 ```elisp
-(setq marp-engine "marp-mermaid-engine")
+(setq marp-engine
+      (expand-file-name
+       (concat (string-trim (shell-command-to-string "npm root -g"))
+               "/marp-mermaid-engine/engine.mjs")))
 ```
 
 Or run Marp directly:
 
 ```sh
-marp --engine marp-mermaid-engine --preview slides.md
+marp --engine "$(npm root -g)/marp-mermaid-engine/engine.mjs" --preview slides.md
 ```
 
-The GitHub repository is public. The `"private": true` field in `package.json` only prevents accidental `npm publish`; it does not affect GitHub visibility, cloning, or use as a Marp engine.
+To update, run the same `npm install -g` command again. The GitHub repository is public. The `"private": true` field in `package.json` only prevents accidental `npm publish`; it does not affect GitHub installation or using the engine file with Marp.
+
+Marp CLI resolves package specifiers from the Markdown file and current working directory, not npm's global module directory. Therefore, after a global install, pass the engine file path shown above rather than the bare package name.
 
 ## Test
 
